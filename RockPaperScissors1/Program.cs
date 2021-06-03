@@ -16,11 +16,12 @@ namespace RockPaperScissors1
             bool successfulConversion = false;
             int playerChoiceInt;
             // int computerChoice;
+            string playAgain;
             //get a random number generator object
             Random rand = new Random();
             
-            // do
-            // {   
+            do
+            {   
                 rounds = 0;  
                        
                 do
@@ -43,7 +44,7 @@ namespace RockPaperScissors1
                         // play game
                         // computer selection
                         int computerChoice = rand.Next(1, 4);
-                        // int computerChoice = 2;
+                        Console.WriteLine($"The computer chose {computerChoice}");
 
                         //check who won. copied from example code in class
                         if ((playerChoiceInt == 1 && computerChoice == 2)
@@ -60,11 +61,9 @@ namespace RockPaperScissors1
                     
                     
                 } while (rounds < 3);
-            //     // string playAgain = "yes";
-            //     string playAgain;
-            //     Console.WriteLine("Do you want to play again? yes or no");
-            //     string playAgain = Console.ReadLine();
-            // } while (playAgain == "yes");
+                Console.WriteLine("Do you want to play again? yes or no");
+                playAgain = Console.ReadLine();
+            } while (playAgain == "yes");
 
         }
     }
