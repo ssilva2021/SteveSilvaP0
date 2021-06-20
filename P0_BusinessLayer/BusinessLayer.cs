@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using P0DbContext;
+using P0_UI;
 
 namespace P0
 {
@@ -10,7 +11,8 @@ namespace P0
 
         public void SearchCustomers()
         {
-            using (var db = new P0Context()) {
+            // using (var db = new P0Context()) {
+            using (var db = new P0DbContext.P0Context()) {
 
             var query = db.Customers.OrderBy (b => b.FirstName);
             
