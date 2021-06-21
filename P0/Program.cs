@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Collections.Generic;
 using P0DbContext;
 // using P0_BusinessLayer;
 using P0_UI;
@@ -160,7 +161,7 @@ namespace P0
             Console.WriteLine("Press any key to exit...");
             Console.ReadKey();
         }
-        static void SelectCustomer()
+        static int SelectCustomer()
         {
             using (var db = new P0Context()) {
 
@@ -169,9 +170,12 @@ namespace P0
             Console.WriteLine(" Select a customer: ");
 
             int menuItem = 1;
+            List<int> custIDs = new List<int>();
+
             foreach (var item in query) {
                Console.WriteLine(menuItem + ") " + item.FirstName +" "+ item.LastName);
                menuItem++;
+               custIDs.Add(item.CustomerId);
                 }
 
             Console.WriteLine("Enter the number of the customer you want to use:");
@@ -179,13 +183,85 @@ namespace P0
             int customerSelected = menu.getMenuSelection(1, 20); // need to use length for max
                                                     // pagination will be required too.
             System.Console.WriteLine("You selected " + customerSelected);
+            System.Console.WriteLine("Which is UserID: " + custIDs[customerSelected-1]);
             // System.Console.WriteLine(query.);
             Console.WriteLine("Press any key to exit...");
             Console.ReadKey();
             // return customerSelected;
+            return custIDs[customerSelected-1];
             }
+        }
+        static int SelectStore()
+        {
+            using (var db = new P0Context()) {
 
+            var query = db.Stores.OrderBy (b => b.StoreName);
             
+            Console.WriteLine(" Select a store: ");
+
+            int menuItem = 1;
+            List<int> storeIDs = new List<int>();
+
+            foreach (var item in query) {
+               Console.WriteLine(menuItem + ") " + item.StoreName);
+               menuItem++;
+               storeIDs.Add(item.StoreId);
+                }
+
+            Console.WriteLine("Enter the number of the store you want to use:");
+            Menus menu = new Menus();
+            int storeSelected = menu.getMenuSelection(1, 20); // need to use length for max
+                                                    // pagination will be required too.
+            System.Console.WriteLine("You selected " + storeSelected);
+            System.Console.WriteLine("Which is StoreID: " + storeIDs[storeSelected-1]);
+            // System.Console.WriteLine(query.);
+            Console.WriteLine("Press any key to exit...");
+            Console.ReadKey();
+            // return customerSelected;
+            return storeIDs[storeSelected-1];
+            }
+        }
+        static int SelectStoreInventory()
+        {
+            using (var db = new P0Context()) {
+            /*
+            select Products.ProductName, StoreInventory.Quantity from Products
+            INNER JOIN StoreInventory ON Products.ProductID=StoreInventory.ProductID
+            WHERE StoreInventory.StoreID=1;
+            */
+
+            // var query = db.StoreInventories.OrderBy (b => b.StoreId);
+            // select id,title,description from articles inner join users on users.id = articles.id where users.id=10
+            var innerJoinQuery =
+                from pduct in db.Products
+                join storeInv in db.StoreInventories on pduct.ProductId equals storeInv.ProductId
+                select new { ProductName = pduct.ProductName }; 
+                //produces flat sequence
+
+            Console.WriteLine(" Select a product: ");
+
+            int menuItem = 1;
+            // List<int> storeIDs = new List<int>();
+
+            foreach (var item in innerJoinQuery) {
+               Console.WriteLine(menuItem + ") " + item.ProductName);
+               menuItem++;
+            //    storeIDs.Add(item.StoreId);
+                }
+
+            Console.WriteLine("Enter the number of the store you want to use:");
+            Menus menu = new Menus();
+            int productSelected = menu.getMenuSelection(1, 20); // need to use length for max
+                                                    // pagination will be required too.
+            System.Console.WriteLine("You selected " + productSelected);
+            // System.Console.WriteLine("Which is StoreID: " + storeIDs[storeSelected-1]);
+            // System.Console.WriteLine(query.);
+            Console.WriteLine("Press any key to exit...");
+            Console.ReadKey();
+            // return customerSelected;
+            // return storeIDs[storeSelected-1];
+            return 0;
+            }
         }
         static void NewCustomer()
         {
@@ -247,10 +323,29 @@ namespace P0
         }
         static void NewOrder()
         {
-            // int customer = SelectCustomer();
-            
-            SelectCustomer();
-            // System.Console.WriteLine(customer);
+            // select a customer
+            int customerID = SelectCustomer();
+            // select a store
+            int storeID = SelectStore();
+            // create header record
+            using (var db = new P0Context()) {
+
+            Order order = new Order();
+            order.CustomerId = customerID;
+            order.StoreId = storeID;
+            // store.StoreName = StoreName;
+            // store.StoreAddr1 = StreetAddress;
+            // store.StoreCity = City;
+            // store.StoreZip = Zipcode;
+            db.Orders.Add(order);
+            db.SaveChanges();        
+            }
+            // Now select products for order
+            int x = 0;
+            do {
+                x = SelectStoreInventory();
+            }while(true);
+
         }
     }
 
