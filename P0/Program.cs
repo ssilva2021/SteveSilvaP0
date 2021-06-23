@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
 using P0DbContext;
 // using P0_BusinessLayer;
 using P0_UI;
@@ -221,7 +222,7 @@ namespace P0
             return storeIDs[storeSelected-1];
             }
         }
-        static int SelectStoreInventory()
+        static int SelectStoreInventory(int storeID)
         {
             using (var db = new P0Context()) {
             /*
@@ -235,8 +236,24 @@ namespace P0
             var innerJoinQuery =
                 from pduct in db.Products
                 join storeInv in db.StoreInventories on pduct.ProductId equals storeInv.ProductId
-                select new { ProductName = pduct.ProductName }; 
-                //produces flat sequence
+                // where storeInv.StoreId = storeID
+                select new { 
+                    ProductID = pduct.ProductId,
+                    ProductName = pduct.ProductName, 
+                    StoreID = storeInv.StoreId, 
+                    StoreQuantity = storeInv.Quantity,
+                    // StorePrice = storeInv.Price
+                    };
+
+            // IEnumerable<Product> results = db.ExecuteQuery<Product>
+            // IEnumerable<Product> results = db.FromSqlRaw<Product>
+            // ("select Products.ProductName, StoreInventory.Quantity from Products INNER JOIN StoreInventory ON Products.ProductID=StoreInventory.ProductID WHERE StoreInventory.StoreID = {0}",
+            // 1);
+
+                // where storeInv.StoreID == storeID
+                // // where storeInv.StoreID == 1
+                // select new { ProductName = pduct.ProductName }; 
+                // //produces flat sequence
 
             Console.WriteLine(" Select a product: ");
 
@@ -244,12 +261,19 @@ namespace P0
             // List<int> storeIDs = new List<int>();
 
             foreach (var item in innerJoinQuery) {
-               Console.WriteLine(menuItem + ") " + item.ProductName);
-               menuItem++;
+                if (item.StoreID == storeID)
+                {
+                    // Console.WriteLine(menuItem + ") " + item.ProductName + " (store: " + item.StoreID + "  Inventory: " + item.StoreQuantity + " Product ID: " + item.ProductID + " Price: " + item.StorePrice + ")");
+                    Console.WriteLine(menuItem + ") " + item.ProductName + " (store: " + item.StoreID + "  Inventory: " + item.StoreQuantity + " Product ID: " + item.ProductID + ") ");
+                    menuItem++;
+
+                }
+                // Console.WriteLine(menuItem + ") " + item.ProductName + " store: " + item.StoreID);
+                // menuItem++;
             //    storeIDs.Add(item.StoreId);
                 }
 
-            Console.WriteLine("Enter the number of the store you want to use:");
+            Console.WriteLine("Enter the number of the product you want:");
             Menus menu = new Menus();
             int productSelected = menu.getMenuSelection(1, 20); // need to use length for max
                                                     // pagination will be required too.
@@ -343,7 +367,7 @@ namespace P0
             // Now select products for order
             int x = 0;
             do {
-                x = SelectStoreInventory();
+                x = SelectStoreInventory(storeID);
             }while(true);
 
         }

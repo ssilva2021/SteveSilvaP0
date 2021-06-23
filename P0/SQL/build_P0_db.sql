@@ -23,9 +23,11 @@ CREATE TABLE Orders (
     OrderID int IDENTITY(1,1) NOT NULL,
     OrderNumber int NOT NULL,
     CustomerID int,
+    StoreID int,
     OrderDate datetime not null default(current_timestamp),
     PRIMARY KEY (OrderID),
     FOREIGN KEY (CustomerID) REFERENCES Customers(CustomerID)
+    FOREIGN KEY (StoreID) REFERENCES Stores(StoreID)
 ); 
 
 CREATE TABLE Products (
@@ -47,6 +49,7 @@ CREATE TABLE OrdersItems (
     OrderID int NOT NULL,
     ProductID int NOT NULL,
     Price money NOT NULL,
+    Quantity int NOT NULL,
     PRIMARY KEY (OrderItemID),
     FOREIGN KEY (OrderID) REFERENCES Orders(OrderID),
     FOREIGN KEY (ProductID) REFERENCES Products(ProductID)
