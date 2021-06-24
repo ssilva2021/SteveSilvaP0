@@ -242,7 +242,7 @@ namespace P0
                     ProductName = pduct.ProductName, 
                     StoreID = storeInv.StoreId, 
                     StoreQuantity = storeInv.Quantity,
-                    // StorePrice = storeInv.Price
+                    StorePrice = storeInv.Price
                     };
 
             // IEnumerable<Product> results = db.ExecuteQuery<Product>
@@ -255,7 +255,7 @@ namespace P0
                 // select new { ProductName = pduct.ProductName }; 
                 // //produces flat sequence
 
-            Console.WriteLine(" Select a product: ");
+            Console.WriteLine(" Select a product (0 to exit): ");
 
             int menuItem = 1;
             List<int> storeProductIDs = new List<int>();
@@ -264,8 +264,10 @@ namespace P0
                 if (item.StoreID == storeID)
                 {
                     // Console.WriteLine(menuItem + ") " + item.ProductName + " (store: " + item.StoreID + "  Inventory: " + item.StoreQuantity + " Product ID: " + item.ProductID + " Price: " + item.StorePrice + ")");
+                    // Console.WriteLine(menuItem + ") " + item.ProductName + " (store: " + item.StoreID + "  Inventory: " + item.StoreQuantity + " Product ID: " + item.ProductID + " Price: " + item.StorePrice.ToString() + ")");
                     Console.WriteLine(menuItem + ") " + item.ProductName + " (store: " + item.StoreID + "  Inventory: " + item.StoreQuantity + " Product ID: " + item.ProductID + ") ");
                     storeProductIDs.Add(item.ProductID);
+                    System.Console.WriteLine(item.StorePrice);
                     menuItem++;
                 }
                 // Console.WriteLine(menuItem + ") " + item.ProductName + " store: " + item.StoreID);
@@ -345,6 +347,7 @@ namespace P0
 
             System.Console.ReadLine();
         }
+        // static void AddOrderItem(int OrderID, int ProductID, decimal StorePrice)
         static void AddOrderItem(int OrderID, int ProductID)
         {
 
@@ -355,6 +358,7 @@ namespace P0
             OrdersItem orderItem = new OrdersItem();
             orderItem.OrderId = OrderID;
             orderItem.ProductId = ProductID;
+            // orderItem.Price = StorePrice;
             orderItem.Price = 0;
             orderItem.Quantity = 1;
 
@@ -381,7 +385,7 @@ namespace P0
             // store.StoreZip = Zipcode;
             db.Orders.Add(order);
             db.SaveChanges();    
-            System.Console.WriteLine(order.OrderId);  
+            System.Console.WriteLine("OrderID: " + order.OrderId);  
             OrderID = order.OrderId;  
             Console.WriteLine("Press any key to exit...");
             Console.ReadKey();
