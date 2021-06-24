@@ -258,15 +258,15 @@ namespace P0
             Console.WriteLine(" Select a product: ");
 
             int menuItem = 1;
-            // List<int> storeIDs = new List<int>();
+            List<int> storeProductIDs = new List<int>();
 
             foreach (var item in innerJoinQuery) {
                 if (item.StoreID == storeID)
                 {
                     // Console.WriteLine(menuItem + ") " + item.ProductName + " (store: " + item.StoreID + "  Inventory: " + item.StoreQuantity + " Product ID: " + item.ProductID + " Price: " + item.StorePrice + ")");
                     Console.WriteLine(menuItem + ") " + item.ProductName + " (store: " + item.StoreID + "  Inventory: " + item.StoreQuantity + " Product ID: " + item.ProductID + ") ");
+                    storeProductIDs.Add(item.ProductID);
                     menuItem++;
-
                 }
                 // Console.WriteLine(menuItem + ") " + item.ProductName + " store: " + item.StoreID);
                 // menuItem++;
@@ -278,13 +278,13 @@ namespace P0
             int productSelected = menu.getMenuSelection(1, 20); // need to use length for max
                                                     // pagination will be required too.
             System.Console.WriteLine("You selected " + productSelected);
-            // System.Console.WriteLine("Which is StoreID: " + storeIDs[storeSelected-1]);
+            System.Console.WriteLine("Which is ProductID: " + storeProductIDs[productSelected-1]);
             // System.Console.WriteLine(query.);
             Console.WriteLine("Press any key to exit...");
             Console.ReadKey();
             // return customerSelected;
             // return storeIDs[storeSelected-1];
-            return 0;
+            return storeProductIDs[productSelected-1];
             }
         }
         static void NewCustomer()
@@ -345,6 +345,23 @@ namespace P0
 
             System.Console.ReadLine();
         }
+        static void AddOrderItem(int OrderID, int ProductID)
+        {
+
+
+
+            using (var db = new P0Context()) {
+
+            OrdersItem orderItem = new OrdersItem();
+            orderItem.OrderId = OrderID;
+            orderItem.ProductId = ProductID;
+            orderItem.Price = 0;
+            orderItem.Quantity = 1;
+
+            db.OrdersItems.Add(orderItem);
+            db.SaveChanges();        
+            }
+        }
         static void NewOrder()
         {
             // select a customer
@@ -352,6 +369,7 @@ namespace P0
             // select a store
             int storeID = SelectStore();
             // create header record
+            int OrderID;
             using (var db = new P0Context()) {
 
             Order order = new Order();
@@ -362,12 +380,23 @@ namespace P0
             // store.StoreCity = City;
             // store.StoreZip = Zipcode;
             db.Orders.Add(order);
-            db.SaveChanges();        
+            db.SaveChanges();    
+            System.Console.WriteLine(order.OrderId);  
+            OrderID = order.OrderId;  
+            Console.WriteLine("Press any key to exit...");
+            Console.ReadKey();
             }
+            
             // Now select products for order
-            int x = 0;
+            int pId = 0;
             do {
-                x = SelectStoreInventory(storeID);
+                pId = SelectStoreInventory(storeID);
+                System.Console.WriteLine("Order ID: " + OrderID);
+                System.Console.WriteLine("Store ID: " + storeID);
+                System.Console.WriteLine("Product ID: " + pId);
+                AddOrderItem(OrderID, storeID);
+                Console.WriteLine("Press any key to exit...");
+                Console.ReadKey();
             }while(true);
 
         }
