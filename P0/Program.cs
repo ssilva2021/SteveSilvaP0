@@ -347,19 +347,16 @@ namespace P0
 
             System.Console.ReadLine();
         }
-        // static void AddOrderItem(int OrderID, int ProductID, decimal StorePrice)
-        static void AddOrderItem(int OrderID, int ProductID)
+        static void AddOrderItem(int OrderID, int ProductID, decimal StorePrice)
+        // static void AddOrderItem(int OrderID, int ProductID)
         {
-
-
-
             using (var db = new P0Context()) {
 
             OrdersItem orderItem = new OrdersItem();
             orderItem.OrderId = OrderID;
             orderItem.ProductId = ProductID;
-            // orderItem.Price = StorePrice;
-            orderItem.Price = 0;
+            orderItem.Price = StorePrice;
+            // orderItem.Price = 0;
             orderItem.Quantity = 1;
 
             db.OrdersItems.Add(orderItem);
@@ -394,15 +391,54 @@ namespace P0
             // Now select products for order
             int pId = 0;
             do {
+                // get a product ID for items in stock at the selected store
                 pId = SelectStoreInventory(storeID);
                 System.Console.WriteLine("Order ID: " + OrderID);
                 System.Console.WriteLine("Store ID: " + storeID);
                 System.Console.WriteLine("Product ID: " + pId);
-                AddOrderItem(OrderID, storeID);
+                // now get the store price for that product ID
+                decimal storePrice = StorePrice(storeID, pId);
+                System.Console.WriteLine("Store Price = " + storePrice);
+                // get the number of items available at the store
+                int inventoryQty = StoreInventoryQty(storeID, pId);
+                System.Console.WriteLine($"How many? (Max {inventoryQty}):");
+                // input the quantity for the order
+                // don't allow quantities greater than items in stock
+                Menus menu = new Menus();
+                int orderQty = menu.getMenuSelection(0, inventoryQty);
+                System.Console.WriteLine("You want : " +orderQty);
+                // add the order item reecord
+                AddOrderItem(OrderID, pId, storePrice);
+                // update store inventory
+                
                 Console.WriteLine("Press any key to exit...");
                 Console.ReadKey();
             }while(true);
 
+        }
+        public static decimal StorePrice(int storeID, int productID)
+        {
+            using (var db = new P0Context()) {
+                /* 
+                select Price from StoreInventory
+                where ProductID = 2 AND StoreID = 2;
+                */
+                StoreInventory result = db.StoreInventories.Where(x => x.StoreId == storeID && x.ProductId == productID).FirstOrDefault();
+                Console.WriteLine($"THe result is {result.Price}. \n the Product is  {result.Product}");
+            return result.Price;
+            }
+        }
+        public static int StoreInventoryQty(int storeID, int productID)
+        {
+            using (var db = new P0Context()) {
+                /* 
+                select Price from StoreInventory
+                where ProductID = 2 AND StoreID = 2;
+                */
+                StoreInventory result = db.StoreInventories.Where(x => x.StoreId == storeID && x.ProductId == productID).FirstOrDefault();
+                Console.WriteLine($"THe result is {result.Quantity}. \n the Product is  {result.Product}");
+            return result.Quantity;
+            }
         }
     }
 
