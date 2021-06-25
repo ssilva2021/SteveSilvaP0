@@ -243,17 +243,7 @@ namespace P0
                     StoreID = storeInv.StoreId, 
                     StoreQuantity = storeInv.Quantity,
                     StorePrice = storeInv.Price
-                    };
-
-            // IEnumerable<Product> results = db.ExecuteQuery<Product>
-            // IEnumerable<Product> results = db.FromSqlRaw<Product>
-            // ("select Products.ProductName, StoreInventory.Quantity from Products INNER JOIN StoreInventory ON Products.ProductID=StoreInventory.ProductID WHERE StoreInventory.StoreID = {0}",
-            // 1);
-
-                // where storeInv.StoreID == storeID
-                // // where storeInv.StoreID == 1
-                // select new { ProductName = pduct.ProductName }; 
-                // //produces flat sequence
+                };
 
             Console.WriteLine(" Select a product (0 to exit): ");
 
@@ -270,15 +260,15 @@ namespace P0
                     System.Console.WriteLine(item.StorePrice);
                     menuItem++;
                 }
-                // Console.WriteLine(menuItem + ") " + item.ProductName + " store: " + item.StoreID);
-                // menuItem++;
-            //    storeIDs.Add(item.StoreId);
-                }
+            }
 
-            Console.WriteLine("Enter the number of the product you want:");
+            Console.WriteLine("Enter the number of the product you want ( 0 to exit ):");
             Menus menu = new Menus();
-            int productSelected = menu.getMenuSelection(1, 20); // need to use length for max
-                                                    // pagination will be required too.
+            int productSelected = menu.getMenuSelection(0, menuItem); // pagination will be required too.
+            if (productSelected == 0)
+            {
+                return 0;
+            }
             System.Console.WriteLine("You selected " + productSelected);
             System.Console.WriteLine("Which is ProductID: " + storeProductIDs[productSelected-1]);
             // System.Console.WriteLine(query.);
@@ -393,6 +383,10 @@ namespace P0
             do {
                 // get a product ID for items in stock at the selected store
                 pId = SelectStoreInventory(storeID);
+                if (pId == 0)
+                {
+                    break;
+                }
                 System.Console.WriteLine("Order ID: " + OrderID);
                 System.Console.WriteLine("Store ID: " + storeID);
                 System.Console.WriteLine("Product ID: " + pId);
@@ -409,6 +403,8 @@ namespace P0
                 System.Console.WriteLine("You want : " +orderQty);
                 // add the order item reecord
                 AddOrderItem(OrderID, pId, storePrice);
+
+                DecrementStoreInventory(storeID, pId, orderQty);
                 // update store inventory
                 
                 Console.WriteLine("Press any key to exit...");
@@ -439,6 +435,18 @@ namespace P0
                 Console.WriteLine($"THe result is {result.Quantity}. \n the Product is  {result.Product}");
             return result.Quantity;
             }
+        }
+        public static void DecrementStoreInventory(int storeID, int productID, int orderQty)
+        {
+            int storeQuantity =0;
+            using (var db = new P0Context()) {
+                StoreInventory result = db.StoreInventories.Where(x => x.StoreId == storeID && x.ProductId == productID).FirstOrDefault();
+                Console.WriteLine($"The result is {result.Quantity}. \n the Product is  {result.Product}");
+                storeQuantity = result.Quantity;
+                result.Quantity = result.Quantity - orderQty;
+                db.SaveChanges();
+            }
+            
         }
     }
 
